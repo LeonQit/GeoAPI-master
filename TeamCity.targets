@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="BuildRelease">
+	<PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
+    <Platform Condition="'$(Platform)' == ''">Any CPU</Platform>
+    <OutputPath>tmp</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SolutionFile>$(MSBuildThisFileDirectory)GeoAPI.sln</SolutionFile>
+		<SolutionDir>$(MSBuildThisFileDirectory)</SolutionDir>
+		<GeoAPIVersion Condition=" '$(GeoAPIVersion)' == '' ">1.7.4</GeoAPIVersion>	
+		<AsmFileVersion Condition=" '$(AsmFileVersion)' == '' ">$(GeoAPIVersion)</AsmFileVersion>
+		<NuGetOutDir>"$(MSBuildProjectDirectory)\Release"</NuGetOutDir>	
+		<NuGetVersion Condition=" '$(NuGetVersion)' == '' ">$(AsmFileVersion)</NuGetVersion>
+		<NuGetCommand Condition=" '$(NuGetCommand)' == '' ">"$(MSBuildThisFileDirectory).nuget\NuGet.exe"</NuGetCommand>
+    
+	</PropertyGroup>
+
+  <Target Name="tmp">
+    <Message Text="$(SolutionDir)$(Configuration)\$(TargetFrameworkIdentifier)$(TargetFrameworkVersion)\$(Platform)" />
+  </Target>
+  
+	<Target Name="BuildRelease20">
+		<RemoveDir Directories="$(MSBuildThisFileDirectory)obj\v2.0" ContinueOnError="true"/>
+		<MSBuild Projects="$(SolutionFile)" 
+             Targets="GeoAPI" 
+             Properties="Configuration=Release;TargetFrameworkVersion=v2.0;TargetFrameworkProfile=;DefineConstants=TRACE;NET20;BaseIntermediateOutputPath=$(MSBuildThisFileDirectory)obj\v2.0\;" 
+             RunEachTargetSeparately="true" 
+             ContinueOnError="true" 
+             />        
+	</Target>
+	<Target Name="BuildRelease35">
+		<RemoveDir Directories="$(MSBuildThisFileDirectory)obj\v3.5" ContinueOnError="true"/>
+		<MSBuild Projects="$(SolutionFile)" 
+             Targets="GeoAPI" 
+             Properties="Configuration=Release;TargetFrameworkVersion=v3.5;TargetFrameworkProfile=Client;DefineConstants=TRACE;NET20;NET35;BaseIntermediateOutputPath=$(MSBuildThisFileDirectory)obj\v3.5\;" 
+             RunEachTargetSeparately="true" 
+             ContinueOnError="true" />
+	</Target>
+	<Target Name="BuildRelease40">
+		<RemoveDir Directories="$(MSBuildThisFileDirectory)obj\v4.0" ContinueOnError="true"/>
+		<MSBuild Projects="$(SolutionFile)" 
+             Targets="GeoAPI" 
+             Properties="Configuration=Release;TargetFrameworkVersion=v4.0;TargetFrameworkProfile=Client;DefineConstants=TRACE;NET20;NET35;NET40;BaseIntermediateOutputPath=$(MSBuildThisFileDirectory)obj\v4.0\;" 
+             RunEachTargetSeparately="true" 
+             ContinueOnError="true" 
+             />
+	</Target>
+	<Target Name="BuildRelease403">
+		<RemoveDir Directories="$(MSBuildThisFileDirectory)obj\v4.0.3" ContinueOnError="true"/>
+		<MSBuild Projects="$(SolutionFile)" 
+             Targets="GeoAPI" 
+             Properties="Configuration=Release;TargetFrameworkVersion=v4.0.3;TargetFrameworkProfile=Client;DefineConstants=TRACE;NET20;NET35;NET40;BaseIntermediateOutputPath=$(MSBuildThisFileDirectory)obj\v4.0.3\;" 
+             RunEachTargetSeparately="true" 
+             ContinueOnError="true" 
+             />        
+	</Target>
+	<Target Name="BuildRelease45">
+		<RemoveDir Directories="$(MSBuildThisFileDirectory)obj\v4.5" ContinueOnError="true"/>
+		<MSBuild Projects="$(SolutionFile)" 
+             Targets="GeoAPI" 
+             Properties="Configuration=Release;TargetFrameworkVersion=v4.5;TargetFrameworkProfile=;DefineConstants=TRACE;NET20;NET35;NET40;BaseIntermediateOutputPath=$(MSBuildThisFileDirectory)obj\v4.5\" 
+             RunEachTargetSeparately="true" 
+             ContinueOnError="true" 
+             />
+	</Target>
+	<Target Name="BuildReleasePCL">
+		<RemoveDir Directories="$(MSBuildThisFileDirectory)obj\PCL" ContinueOnError="true"/>
+		<MSBuild Projects="$(SolutionFile)" 
+             Targets="GeoAPI_PCL" 
+             Properties="Configuration=Release;TargetFrameworkVersion=v4.0;TargetFrameworkProfile=Profile336;DefineConstants=TRACE;PCL;BaseIntermediateOutputPath=$(MSBuildThisFileDirectory)obj\PCL\" 
+             RunEachTargetSeparately="true" 
+             ContinueOnError="true" 
+             />
+	</Target>
+
+	<Target Name="BuildRelease" DependsOnTargets="BuildRelease20;BuildRelease35;BuildRelease40;BuildRelease403;BuildRelease45;BuildReleasePCL"/>    
+
+	<Target Name="NuGetPack" DependsOnTargets="BuildRelease">
+		<Exec Command="$(NuGetCommand) update -self"/>
+		<Exec Command="$(NuGetCommand) pack GeoAPI.nuspec -Version $(NuGetVersion) -outputdirectory $(NuGetOutDir) -symbols"/>
+	</Target>
+
+	<!-- 
+    TODO: add targets here to build zip, NuGet, ...    
+    -->
+
+	<Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets"/>
+</Project>
